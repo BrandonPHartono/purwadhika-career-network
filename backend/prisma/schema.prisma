@@ -1,0 +1,195 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ALUMNI)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile            AlumniProfile?
+  company            Company?
+  applications       Application[]
+  notifications      Notification[]
+  eventRegistrations EventRegistration[]
+  sentMessages       Message[]           @relation("SentMessages")
+  receivedMessages   Message[]           @relation("ReceivedMessages")
+}
+
+model AlumniProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  batch             String?
+  program           String?
+  graduationYear    Int?
+  currentTitle      String?
+  currentCompany    String?
+  yearsExp          Int?
+  skills            String[]
+  level             String?
+  workType          String?
+  city              String?
+  status            String   @default("OPEN")
+  bio               String?
+  linkedinUrl       String?
+  portfolioUrl      String?
+  cvUrl             String?
+  profileCompletion Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  name        String
+  industry    String?
+  description String?
+  logoUrl     String?
+  website     String?
+  picName     String?
+  picEmail    String?
+  feePerHire  Float?
+  status      String    @default("PENDING")
+  signedAt    DateTime?
+
+  user User  @relation(fields: [userId], references: [id])
+  jobs Job[]
+}
+
+model Job {
+  id               String   @id @default(cuid())
+  title            String
+  description      String   @db.Text
+  requirements     String[]
+  responsibilities String[]
+  skills           String[]
+  level            String
+  workType         String
+  city             String?
+  salaryMin        Int?
+  salaryMax        Int?
+  status           String   @default("ACTIVE")
+  companyId        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  company      Company       @relation(fields: [companyId], references: [id])
+  applications Application[]
+}
+
+model Application {
+  id             String    @id @default(cuid())
+  userId         String
+  jobId          String
+  coverLetter    String?   @db.Text
+  availability   String?
+  salaryExpected Int?
+  status         AppStatus @default(APPLIED)
+  appliedAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  reviewedAt     DateTime?
+  interviewedAt  DateTime?
+
+  user      User       @relation(fields: [userId], references: [id])
+  job       Job        @relation(fields: [jobId], references: [id])
+  interview Interview?
+
+  @@unique([userId, jobId])
+}
+
+model Interview {
+  id              String   @id @default(cuid())
+  applicationId   String   @unique
+  scheduledAt     DateTime
+  durationMinutes Int      @default(60)
+  meetLink        String?
+  calendarEventId String?
+  status          String   @default("SCHEDULED")
+  notes           String?
+
+  application Application @relation(fields: [applicationId], references: [id])
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String    @db.Text
+  type          String
+  date          DateTime
+  endDate       DateTime?
+  location      String
+  isOnline      Boolean   @default(false)
+  meetLink      String?
+  maxParticipants Int?
+  status        String    @default("OPEN")
+  cancelReason  String?
+  createdAt     DateTime  @default(now())
+
+  registrations EventRegistration[]
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  status    String   @default("REGISTERED")
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  type      String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  content    String   @db.Text
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentMessages",     fields: [senderId],   references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+enum Role {
+  ALUMNI
+  PARTNER
+  ADMIN
+}
+
+enum AppStatus {
+  APPLIED
+  REVIEWED
+  INTERVIEW
+  OFFERED
+  HIRED
+  REJECTED
+}
