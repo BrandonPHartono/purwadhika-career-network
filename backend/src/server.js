@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const https = require("https");
 
 dotenv.config();
 const app = express();
@@ -23,10 +24,10 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const jobRoutes = require("./routes/jobs");
 const applicationRoutes = require("./routes/applications");
-const broadcastRoutes = require("./routes/broadcasts");
+const broadcastRoutes = require("./routes/broadcast");
 const eventRoutes = require("./routes/events");
-const scheduleRoutes = require("./routes/schedules");
-const messageRoutes = require("./routes/messages");
+const scheduleRoutes = require("./routes/schedule");
+const messageRoutes = require("./routes/message");
 const partnerRoutes = require("./routes/partner");
 const adminRoutes = require("./routes/admin");
 const alumniRoutes = require("./routes/alumni");
@@ -62,6 +63,22 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ── Keep-alive ping untuk Render free tier ───────
+if (process.env.NODE_ENV === "production") {
+  setInterval(
+    () => {
+      try {
+        https.get(
+          process.env.RENDER_URL || "https://pcn-backend-rpj8.onrender.com",
+        );
+        console.log("Keep-alive ping sent");
+      } catch {}
+    },
+    10 * 60 * 1000,
+  ); // ping setiap 10 menit
+}
+
+// ── Start server ─────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
