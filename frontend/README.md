@@ -1,16 +1,79 @@
-# React + Vite
+# Purwadhika Career Network
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Platform rekrutmen digital khusus alumni Purwadhika — menghubungkan lulusan dengan hiring partner melalui smart matching dan automated notifications.
 
-Currently, two official plugins are available:
+## 🚀 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **App:** https://purwadhika-career-network.vercel.app
+- **API:** https://pcn-backend-rpj8.onrender.com
 
-## React Compiler
+## 🔑 Demo Accounts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Role    | Email                | Password   |
+| ------- | -------------------- | ---------- |
+| Alumni  | rizky@alumni.com     | alumni123  |
+| Partner | hr@tokopedia.com     | partner123 |
+| Admin   | admin@purwadhika.com | admin123   |
 
-## Expanding the ESLint configuration
+## 🎯 Problem Yang Diselesaikan
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Problem                                    | Solusi                                   |
+| ------------------------------------------ | ---------------------------------------- |
+| Admin kirim info loker manual via WA       | Broadcast email otomatis tersegmentasi   |
+| Tidak ada matching skill alumni & lowongan | Smart matching algorithm 0-100%          |
+| Scheduling interview via WA bolak-balik    | Integrated slot picker + Google Calendar |
+| Admin tidak bisa monitor pipeline hiring   | Kanban pipeline real-time                |
+
+## 🛠️ Tech Stack
+
+| Layer    | Teknologi                                           |
+| -------- | --------------------------------------------------- |
+| Frontend | React 18, Vite, Tailwind CSS, Zustand, React Router |
+| Backend  | Node.js, Express, Prisma ORM                        |
+| Database | PostgreSQL via Supabase                             |
+| Auth     | JWT + bcrypt                                        |
+| Email    | Resend API                                          |
+| Calendar | Google Calendar API                                 |
+| Deploy   | Vercel (FE) + Render (BE)                           |
+
+## 📋 Fitur
+
+- **Alumni:** Register, profil (0-100%), lihat job match score, apply, track status lamaran
+- **Hiring Partner:** Post lowongan, lihat kandidat cocok, kelola pipeline kanban
+- **Admin:** Dashboard analytics, broadcast notification, kelola events, kelola user
+
+## 🏃 Cara Jalankan Lokal
+
+### Prerequisites
+
+- Node.js v24+
+- Akun Supabase (gratis)
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/BrandonPHartono/purwadhika-career-network
+
+# Backend
+cd backend && npm install
+cp .env.example .env  # isi variable yang dibutuhkan
+npx prisma migrate dev
+npx prisma db seed
+npm run dev
+
+# Frontend (terminal baru)
+cd frontend && npm install
+cp .env.example .env
+npm run dev
+```
+
+## 📐 Architecture
+
+```
+[ React Frontend ] <-- REST API --> [ Express Backend ]
+       |                                    |
+  Zustand Store                       Prisma ORM
+  React Router                             |
+  Tailwind CSS                    PostgreSQL (Supabase)
+```
